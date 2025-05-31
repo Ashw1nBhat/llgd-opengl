@@ -4,4 +4,4 @@ build/
 /.vs
 .idea/
 CMakeSettings.json
-Makefile
+Makefilegit
