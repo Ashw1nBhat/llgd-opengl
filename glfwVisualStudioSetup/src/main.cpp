@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include <shader.h>
+
 float triangleData[] = {
 	// positions   // colors
 	//x, y, z      // r, g, b
@@ -51,6 +53,12 @@ int main() {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)(sizeof(float) * 3));
 
+#pragma endregion
+
+#pragma region load shaders
+	Shader shader;
+	shader.loadShaderProgramFromFile("resources/myShader.vert", "resources/myShader.frag");
+	shader.bind();
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
