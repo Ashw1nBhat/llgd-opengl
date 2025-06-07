@@ -5,6 +5,14 @@
 
 #include <iostream>
 
+float triangleData[] = {
+	// positions   // colors
+	//x, y, z      // r, g, b
+	  0, 1, 0,        1, 0, 0, // vertex 1
+	  -1, -1, 0,      0, 1, 0, // vertex 2
+	  1, -1, 0,       0, 0, 1 // vertex 3
+};
+
 int main() {
 	if (!glfwInit()) {
 		std::cout << "GLFW Initialization error!\n";
@@ -24,26 +32,37 @@ int main() {
 
 	enableReportGlErrors();
 
+#pragma region buffer
+	// create the buffer
+	GLuint buffer = 0;
+	glGenBuffers(1, &buffer);
+
+	int vertexSize = sizeof(float) * 6;
+
+	// send the data to the buffer
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData), triangleData, GL_STATIC_DRAW);
+
+	// attribute representing the position
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, 0);
+
+	// attribute representing the color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)(sizeof(float) * 3));
+
+#pragma endregion
+
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Legacy openGL code
-		glBegin(GL_TRIANGLES);
-
-		glVertex2f(0, 1);
-		glColor3f(1, 0, 0);
-
-		glVertex2f(-1, -1);
-		glColor3f(0, 1, 0);
-
-		glVertex2f(1, -1);
-		glColor3f(0, 0, 1);
-
-		glEnd();
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	glDeleteBuffers(1, &buffer);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
