@@ -62,6 +62,11 @@ int main() {
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
+		// Tell OpenGL that we resized the window
+		int w = 0, h = 0;
+		glfwGetWindowSize(window, &w, &h);
+		glViewport(0, 0, w, h);
+
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
