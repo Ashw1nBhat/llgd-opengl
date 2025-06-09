@@ -40,6 +40,12 @@ int main() {
 
 	enableReportGlErrors();
 
+#pragma region vao
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+#pragma endregion
+
 #pragma region index buffer
 	GLuint indexBuffer = 0;
 	glGenBuffers(1, &indexBuffer);
@@ -69,6 +75,9 @@ int main() {
 
 #pragma endregion
 
+	// Unbind VAO
+	glBindVertexArray(0);
+
 #pragma region load shaders
 	Shader shader;
 	shader.loadShaderProgramFromFile("resources/myShader.vert", "resources/myShader.frag");
@@ -83,6 +92,8 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// Bind the VAO to specify the vertex buffer, index buffer and the attributes
+		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 
 		glfwSwapBuffers(window);

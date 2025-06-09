@@ -6,5 +6,5 @@ in vec3 v_color;
 in vec3 v_position;
 
 void main() {
-	out_color = vec4(v_color, 1);	
+	out_color = vec4((v_position + 1) / 2, 1);	
 }
