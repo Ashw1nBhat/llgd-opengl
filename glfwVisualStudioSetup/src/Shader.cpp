@@ -156,3 +156,13 @@ void Shader::clear()
 
 	*this = {};
 }
+
+GLint Shader::getUniformLocation(const char* name) {
+	GLint result = glGetUniformLocation(id, name);
+
+	if (result == -1) {
+		std::cout << "Uniform error: " << name << "\n";
+	}
+
+	return result;
+}

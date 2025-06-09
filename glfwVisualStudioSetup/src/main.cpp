@@ -10,9 +10,15 @@
 float triangleData[] = {
 	// positions   // colors
 	//x, y, z      // r, g, b
-	  0, 1, 0,        1, 0, 0, // vertex 1
-	  -1, -1, 0,      0, 1, 0, // vertex 2
-	  1, -1, 0,       0, 0, 1 // vertex 3
+	  0.5, 0.5, 0,        1, 0, 0, // vertex 1
+	  -0.5, 0.5, 0,      0, 1, 0, // vertex 2
+	  -0.5, -0.5, 0,       0, 0, 1, // vertex 3
+	   0.5, -0.5, 0,   0, 0, 1
+};
+
+unsigned short indices[]{
+	0, 1, 2, // First triangle
+	0, 2, 3  // Second triangle
 };
 
 int main() {
@@ -33,6 +39,20 @@ int main() {
 	}
 
 	enableReportGlErrors();
+
+#pragma region vao
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+#pragma endregion
+
+#pragma region index buffer
+	GLuint indexBuffer = 0;
+	glGenBuffers(1, &indexBuffer);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+#pragma endregion
 
 #pragma region buffer
 	// create the buffer
@@ -55,10 +75,14 @@ int main() {
 
 #pragma endregion
 
+	// Unbind VAO
+	glBindVertexArray(0);
+
 #pragma region load shaders
 	Shader shader;
 	shader.loadShaderProgramFromFile("resources/myShader.vert", "resources/myShader.frag");
 	shader.bind();
+	GLint u_time = shader.getUniformLocation("u_time");
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
@@ -69,13 +93,17 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glUniform1f(u_time, (float)(clock()) / 100.f);
+
+		// Bind the VAO to specify the vertex buffer, index buffer and the attributes
+		glBindVertexArray(vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	glDeleteBuffers(1, &buffer);
+	glDeleteBuffers(1, &indexBuffer);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
