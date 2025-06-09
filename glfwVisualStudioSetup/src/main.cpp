@@ -7,6 +7,10 @@
 
 #include <shader.h>
 
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
 float triangleData[] = {
 	// positions   // colors
 	//x, y, z      // r, g, b
@@ -39,6 +43,13 @@ int main() {
 	}
 
 	enableReportGlErrors();
+
+#pragma region imgui
+	ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+	ImGui::GetIO().FontGlobalScale = 2;
+#pragma endregion
 
 #pragma region vao
 	GLuint vao = 0;
@@ -83,6 +94,7 @@ int main() {
 	shader.loadShaderProgramFromFile("resources/myShader.vert", "resources/myShader.frag");
 	shader.bind();
 	GLint u_time = shader.getUniformLocation("u_time");
+	GLint u_color = shader.getUniformLocation("u_color");
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
@@ -93,11 +105,33 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
+#pragma region imgui
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+#pragma endregion
+
+		ImGui::Begin("Window");
+		ImGui::Text("Color test");
+		static float color[3] = { 0.5,0.5,0.5 };
+		ImGui::ColorPicker3("Color: ", color);
+		ImGui::End();
+
 		glUniform1f(u_time, (float)(clock()) / 100.f);
+
+		glUniform3fv(u_color, 1, color);
 
 		// Bind the VAO to specify the vertex buffer, index buffer and the attributes
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+
+#pragma region imgui
+		ImGui::Render();
+		int display_w = 0, display_h = 0;
+		glfwGetFramebufferSize(window, &display_w, &display_h);
+		glViewport(0, 0, display_w, display_h);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#pragma endregion
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
